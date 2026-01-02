@@ -19,7 +19,8 @@ dependencies:
   - docker-py
   - pip
   - pip:
-      - hummingbot
+      - git+https://github.com/aczire/hummingbot.git@feature/dydx_testnet
+      - v4-proto>=8.2.0
       - msgpack>=1.0.5
       - flake8
       - isort

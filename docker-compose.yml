@@ -2,6 +2,9 @@ services:
   hummingbot-api:
     container_name: hummingbot-api
     image: hummingbot/hummingbot-api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
@@ -14,6 +17,8 @@ services:
       - BROKER_HOST=emqx
       - DATABASE_URL=postgresql+asyncpg://hbot:hummingbot-api@postgres:5432/hummingbot_api
       - GATEWAY_URL=http://host.docker.internal:15888
+      # Fix protobuf conflict between v4-proto and injective-py
+      - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
     extra_hosts:
       # Map host.docker.internal to host gateway for Linux compatibility
       # On macOS/Windows, Docker Desktop provides this automatically
@@ -23,6 +28,19 @@ services:
       - emqx-bridge
     depends_on:
       - postgres
+  mcp-server:
+    container_name: hummingbot-mcp
+    image: hummingbot/hummingbot-mcp:latest
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    environment:
+      - HUMMINGBOT_API_URL=http://hummingbot-api:8000
+    depends_on:
+      - hummingbot-api
+    networks:
+      - emqx-bridge
   emqx:
     container_name: hummingbot-broker
     image: emqx:5

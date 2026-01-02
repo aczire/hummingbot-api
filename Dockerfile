@@ -1,9 +1,9 @@
 # Stage 1: Builder stage
 FROM continuumio/miniconda3 AS builder
 
-# Install build dependencies
+# Install build dependencies (g++ needed for hummingbot Cython extensions)
 RUN apt-get update && \
-    apt-get install -y python3-dev gcc && \
+    apt-get install -y python3-dev gcc g++ build-essential && \
     rm -rf /var/lib/apt/lists/*
 
 # Set working directory
